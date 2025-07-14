@@ -21,7 +21,7 @@ class TasksScreen extends StatelessWidget {
                 CircleAvatar(backgroundColor: Colors.white, radius: 30.0,child: Icon(Icons.list,size: 30.0, color: Theme.of(context).colorScheme.primary,),),
                 const SizedBox(height: 10.0,),
                 const Text("Todoey",style: TextStyle(color: Colors.white,fontSize: 50.0, fontWeight: FontWeight.w700),),
-                const Text("12 Tasks",style: TextStyle(color: Colors.white, fontSize: 18.0),)
+                const Text("15 Tasks",style: TextStyle(color: Colors.white, fontSize: 18.0),)
               ],
             ),
           ),
