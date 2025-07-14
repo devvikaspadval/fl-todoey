@@ -20,11 +20,11 @@ jobs:
           channel: 'stable'
           architecture: x64
 
-      - run: flutter build apk --release --split-per-abi
+      - run: flutter build apk --debug --split-per-abi
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/apk/release/*"
+          artifacts: "build/app/outputs/apk/debug/*"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
 
