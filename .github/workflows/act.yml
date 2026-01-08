@@ -1,49 +1,54 @@
+name: Android Release (Persist APK)
+
 on:
-  pull_request:
-    branches:
-      - main
-      - master
   push:
     branches:
-      - main
-      - master
       - develop
-name: "Build & Release"
+      - uat
+      - main
+
 jobs:
-  build:
-    name: Build & Release
-    runs-on: windows-latest
+  build-android:
+    runs-on: ubuntu-latest
+
+    env:
+      FLUTTER_VERSION: "3.27.4"
+
     steps:
-      - uses: actions/checkout@v3
+      # 1. Checkout source
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      # 2. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          architecture: x64
-
+      # 3. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APKs (Split per ABI)
-        run: flutter build apk --release --split-per-abi
+      # 4. Resolve flavor from branch
 
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
+      # 5. Build APK
+      - name: Build APK
+        run: |
+          flutter build apk \
+            --release \
+            -t lib/main.dart
+
+      # 6. Verify APK exists (fail fast if not)
+      - name: Verify APK output
+        run: |
+          ls -lh build/app/outputs/flutter-apk/
+          test -f build/app/outputs/flutter-apk/app-release.apk
+
+      # 7. Persist APK as artifact
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
         with:
-          artifacts: "build/app/outputs/flutter-apk/*.apk"
-          tag: v1.0.${{ github.run_number }}
-          token: ${{ secrets.TOKEN }}
-
-
-
-
-
-
-# push to master, main, develop
-# pull request on main master
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
